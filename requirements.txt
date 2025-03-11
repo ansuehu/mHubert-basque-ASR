@@ -1,0 +1,6 @@
+datasets
+transformers
+librosa
+jiwer
+torch
+numpy
