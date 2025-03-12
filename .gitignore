@@ -4,3 +4,4 @@ checkpoints/
 data/
 .slurm/
 .vscode/
+wandb/

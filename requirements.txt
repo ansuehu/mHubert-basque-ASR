@@ -5,3 +5,4 @@ evaluate
 torch
 numpy
 accelerate>=0.26.0
+wandb

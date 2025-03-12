@@ -83,6 +83,8 @@ def train_model(model_name, data, processor, ctc_only = False, output_dir="check
         output_dir=output_dir,
         group_by_length=True,
         per_device_train_batch_size=64,
+        dataloader_num_workers=4,  # Increase for faster loading
+        # pin_memory=True,
         eval_strategy="steps",
         num_train_epochs=30,
         fp16=True,
@@ -94,7 +96,7 @@ def train_model(model_name, data, processor, ctc_only = False, output_dir="check
         weight_decay=0.005,
         warmup_steps=1000,
         save_total_limit=2,
-        report_to='wandb',
+        report_to=None,
     )
     
     # Set up metrics function
