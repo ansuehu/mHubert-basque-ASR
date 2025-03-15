@@ -1,12 +1,13 @@
 import numpy as np
-from datasets import load_from_disk, DatasetDict
+from datasets import load_from_disk
 from transformers import (
     Wav2Vec2CTCTokenizer,
     Wav2Vec2FeatureExtractor,
     Wav2Vec2Processor,
 )
+from jiwer import wer
 
-def compute_metrics(pred, processor, wer):
+def compute_metrics(pred, processor):
     """Compute Word Error Rate (WER) metric."""
     
     pred_logits = pred.predictions
@@ -51,8 +52,10 @@ def load_data(data_path, split = 'All', sample_size=None):
         data = load_from_disk(data_path, split='test')
         data = data['test']
 
-    if sample_size != None:
-        data = data.select(range(sample_size))
+    if sample_size != None and split == 'All':
+        data = data['train'].select(range(sample_size))
+
+        data = data.train_test_split(test_size=0.2)
 
     print(data)
     return data

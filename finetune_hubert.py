@@ -8,7 +8,7 @@ from transformers import (
 )
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
-from utils import setup_processor, compute_metrics, load_data
+from scripts.utils import setup_processor, compute_metrics, load_data
 
 
 # Define the data collator class for CTC
@@ -64,7 +64,7 @@ class DataCollatorCTCWithPadding:
 
         return batch
 
-def train_model(model_name, data, processor, ctc_only = False, output_dir="checkpoints/mHubert_basque", push_to_hub=False):
+def train_model(model_name, data_train, data_dev, processor, ctc_only = False, output_dir="checkpoints/mHubert_basque", push_to_hub=False):
     """Train the HuBERT model."""
     # Initialize model
     model = HubertForCTC.from_pretrained(model_name)
@@ -81,12 +81,13 @@ def train_model(model_name, data, processor, ctc_only = False, output_dir="check
     # Set up training arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
-        group_by_length=True,
+        group_by_length=False,
         per_device_train_batch_size=64,
-        dataloader_num_workers=4,  # Increase for faster loading
+        per_device_eval_batch_size=4,
+        dataloader_num_workers=8,  # Increase for faster loading
         # pin_memory=True,
         eval_strategy="steps",
-        num_train_epochs=30,
+        num_train_epochs=60,
         fp16=True,
         gradient_checkpointing=True,
         save_steps=400,
@@ -96,7 +97,7 @@ def train_model(model_name, data, processor, ctc_only = False, output_dir="check
         weight_decay=0.005,
         warmup_steps=1000,
         save_total_limit=2,
-        report_to=None,
+        report_to=['tensorboard'],
     )
     
     # Set up metrics function
@@ -108,8 +109,8 @@ def train_model(model_name, data, processor, ctc_only = False, output_dir="check
         data_collator=data_collator,
         args=training_args,
         compute_metrics=metrics_fn,
-        train_dataset=data["train"],
-        eval_dataset=data["dev"],
+        train_dataset=data_train,
+        eval_dataset=data_dev,
         processing_class=processor.feature_extractor,
     )
     
@@ -142,7 +143,7 @@ def main():
 
     # 2. Train model
     print("\nStep 2: Training model...")
-    model = train_model(model_name, data, processor, ctc_only=True)
+    model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=True)
 
     # 3. Save model
     print("\nStep 3: Saving model...")
