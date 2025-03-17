@@ -9,6 +9,7 @@ from transformers import (
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 from scripts.utils import setup_processor, compute_metrics, load_data
+from evaluate import load
 
 
 # Define the data collator class for CTC
@@ -67,7 +68,18 @@ class DataCollatorCTCWithPadding:
 def train_model(model_name, data_train, data_dev, processor, ctc_only = False, output_dir="checkpoints/mHubert_basque", push_to_hub=False):
     """Train the HuBERT model."""
     # Initialize model
-    model = HubertForCTC.from_pretrained(model_name)
+    model = HubertForCTC.from_pretrained(
+        model_name,
+        attention_dropout=0.1,
+        hidden_dropout=0.1,
+        feat_proj_dropout=0.1,
+        mask_time_prob=0.05,
+        layerdrop=0.1,
+        final_dropout=0.3,
+        ctc_loss_reduction="mean",
+        pad_token_id=processor.tokenizer.pad_token_id,
+        vocab_size=len(processor.tokenizer),
+    )
     
     # Freeze base model for transfer learning
     if ctc_only:
@@ -81,27 +93,29 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
     # Set up training arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
-        group_by_length=False,
+        report_to="tensorboard",
         per_device_train_batch_size=64,
         per_device_eval_batch_size=4,
-        dataloader_num_workers=8,  # Increase for faster loading
-        # pin_memory=True,
         eval_strategy="steps",
-        num_train_epochs=60,
-        fp16=True,
-        gradient_checkpointing=True,
-        save_steps=400,
-        eval_steps=400,
-        logging_steps=400,
-        learning_rate=1e-4,
-        weight_decay=0.005,
-        warmup_steps=1000,
-        save_total_limit=2,
-        report_to=['tensorboard'],
+        num_train_epochs=10,
+        fp16=False,
+        save_steps=1000,
+        eval_steps=1000,
+        logging_steps=100,
+        learning_rate=1e-5,
+        adam_beta1=0.9,
+        adam_beta2=0.98,
+        adam_epsilon=1e-08,
+        warmup_ratio=0.1,
+        save_total_limit=5,
+        push_to_hub=False,
+        load_best_model_at_end=True,
     )
     
     # Set up metrics function
-    metrics_fn = lambda pred: compute_metrics(pred, processor)
+    wer_metric = load("wer", trust_remote_code=True)
+
+    metrics_fn = lambda pred: compute_metrics(pred, processor, wer_metric)
     
     # Initialize trainer
     trainer = Trainer(
@@ -143,7 +157,7 @@ def main():
 
     # 2. Train model
     print("\nStep 2: Training model...")
-    model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=True)
+    model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=True, output_dir='checkpoints/mHubert-ASR-eu')
 
     # 3. Save model
     print("\nStep 3: Saving model...")

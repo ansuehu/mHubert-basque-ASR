@@ -7,7 +7,7 @@ from transformers import (
 )
 from jiwer import wer
 
-def compute_metrics(pred, processor):
+def compute_metrics(pred, processor, wer_metric):
     """Compute Word Error Rate (WER) metric."""
     
     pred_logits = pred.predictions
@@ -19,7 +19,7 @@ def compute_metrics(pred, processor):
     # We do not want to group tokens when computing the metrics
     label_str = processor.batch_decode(pred.label_ids, group_tokens=False)
 
-    wer_score = wer(hypothesis=pred_str, reference=label_str)
+    wer_score = wer_metric.compute(predictions=pred_str, references=label_str)
 
     return {"wer": wer_score}
 
@@ -38,7 +38,7 @@ def setup_processor(model_name, vocab_path="./data/vocab.json"):
     
     # Combine into processor
     processor = Wav2Vec2Processor(feature_extractor=feature_extractor, tokenizer=tokenizer)
-    
+
     return processor, feature_extractor.sampling_rate
 
 def load_data(data_path, split = 'All', sample_size=None):

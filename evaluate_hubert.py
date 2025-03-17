@@ -1,8 +1,8 @@
 import torch
 from jiwer import wer
-from utils import setup_processor
+from scripts.utils import setup_processor
 from transformers import HubertForCTC
-from utils import load_data
+from scripts.utils import load_data
 
 def map_to_result(batch, model, processor):
     """Map model predictions to text for evaluation."""
@@ -48,7 +48,7 @@ def main():
     model = HubertForCTC(model_name)
     processor = setup_processor(model_name)
 
-    data = load_data('/data/', split = 'test')
+    data = load_data('/home/andoni.sudupe/mHubert_finetune/data/preprocessed_data')
     # 6. Evaluate model
     print("\nStep 6: Evaluating model...")
     results = evaluate_model(data, model, processor)
