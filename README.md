@@ -1,6 +1,6 @@
 # mHubert-basque-ASR
 
-This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the [composite_corpus_eu_v2.1](https://huggingface.co/asierhv/composite_corpus_eu_v2.1) dataset for ASR in Basque.
+This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the [composite_corpus_eu_v2.1](https://huggingface.co/datasets/asierhv/composite_corpus_eu_v2.1) dataset for ASR in Basque.
 
 Test WER: 0.137
 
