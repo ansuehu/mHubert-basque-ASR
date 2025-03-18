@@ -19,9 +19,9 @@ model-index:
 <!-- This model card has been generated automatically according to the information the Trainer had access to. You
 should probably proofread and complete it, then remove this comment. -->
 
-# hubert_for_basque
+# mHubert-basque-ASR
 
-This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the composite_corpus_eu_v2.1 dataset.
+This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the composite_corpus_eu_v2.1 dataset for ASR in Basque.
 
 Test WER: 0.137
 
