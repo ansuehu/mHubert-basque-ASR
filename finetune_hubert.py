@@ -109,13 +109,15 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
         warmup_ratio=0.1,
         save_total_limit=5,
         push_to_hub=False,
+        group_by_length=False, #Bestela asko tardatzen du hasten entrenamendua. Erabili nahi bada datuek 'length' izeneko zutabe bat izan behar dute.
         load_best_model_at_end=True,
     )
     
     # Set up metrics function
     wer_metric = load("wer", trust_remote_code=True)
+    cer_metric = load("cer", trust_remote_code=True)
 
-    metrics_fn = lambda pred: compute_metrics(pred, processor, wer_metric)
+    metrics_fn = lambda pred: compute_metrics(pred, processor, wer_metric, cer_metric)
     
     # Initialize trainer
     trainer = Trainer(
