@@ -1,12 +1,12 @@
 from datasets import load_from_disk, Audio, concatenate_datasets
 import re
 import json
-from utils import setup_processor
+from scripts.utils import setup_processor
 import os
 
 def remove_special_characters(batch):
     """Remove special characters from text."""
-    chars_to_ignore_regex = r'[\,\?\.\!\-\;\:\"\'\'\'\`\']'
+    chars_to_ignore_regex = r'[\,\?\.\!\-\;\:\"\'\'\'\`\'\±\ã\]'
     batch["sentence"] = re.sub(chars_to_ignore_regex, '', batch["sentence"]).lower()
     return batch
 
@@ -53,15 +53,15 @@ def load_and_prepare_data(sample_size=None):
     
     return data
 
-def create_vocabulary(common_voice):
+def create_vocabulary(data, save = True):
     """Create and save vocabulary from the dataset."""
     # Extract all unique characters to create vocabulary
-    vocabs = common_voice.map(
+    vocabs = data.map(
         extract_all_chars, 
         batched=True, 
         batch_size=-1, 
         keep_in_memory=True, 
-        remove_columns=common_voice.column_names["train"]
+        remove_columns=data.column_names["train"]
     )
     
     # Combine vocabularies from train and test sets
@@ -85,10 +85,13 @@ def create_vocabulary(common_voice):
     vocab_dict["[UNK]"] = len(vocab_dict)
     vocab_dict["[PAD]"] = len(vocab_dict)
     print(f"Vocabulary size: {len(vocab_dict)}")
+
+    print(vocab_dict)
     
     # Save vocabulary to JSON file
-    with open('./data/vocab.json', 'w') as vocab_file:
-        json.dump(vocab_dict, vocab_file)
+    if save:
+        with open('./data/vocab.json', 'w') as vocab_file:
+            json.dump(vocab_dict, vocab_file)
     
     print("Vocabulary saved to vocab.json")
     
