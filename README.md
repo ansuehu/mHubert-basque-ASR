@@ -1,27 +1,6 @@
----
-library_name: transformers
-license: cc-by-nc-sa-4.0
-base_model: utter-project/mHuBERT-147
-tags:
-- generated_from_trainer
-datasets:
-- asierhv/composite_corpus_eu_v2.1
-language:
-- eu
-metrics:
-- wer
-- cer
-model-index:
-- name: hubert_for_basque
-  results: []
----
-
-<!-- This model card has been generated automatically according to the information the Trainer had access to. You
-should probably proofread and complete it, then remove this comment. -->
-
 # mHubert-basque-ASR
 
-This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the composite_corpus_eu_v2.1 dataset for ASR in Basque.
+This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the [composite_corpus_eu_v2.1](https://huggingface.co/asierhv/composite_corpus_eu_v2.1) dataset for ASR in Basque.
 
 Test WER: 0.137
 
