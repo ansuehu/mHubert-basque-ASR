@@ -2,10 +2,6 @@
 
 This model is a fine-tuned version of [utter-project/mHuBERT-147](https://huggingface.co/utter-project/mHuBERT-147) on the [composite_corpus_eu_v2.1](https://huggingface.co/datasets/asierhv/composite_corpus_eu_v2.1) dataset for ASR in Basque.
 
-Test WER: 0.137
-
-Test CER: 0.024
-
 ## Training procedure
 
 All the training and evaluation code is on https://github.com/ansuehu/mHubert-basque-ASR 
@@ -20,58 +16,8 @@ The following hyperparameters were used during training:
 - optimizer: Use OptimizerNames.ADAMW_TORCH with betas=(0.9,0.999) and epsilon=1e-08 and optimizer_args=No additional optimizer arguments
 - lr_scheduler_type: linear
 - lr_scheduler_warmup_steps: 1000
-- num_epochs: 7
+- num_epochs: 24
 - mixed_precision_training: Native AMP
-
-### Training results
-
-| Steps | Eval Loss | WER (%) |
-| ----- | --------- | ------- |
-| 1000  | 9.779     | 99.99   |
-| 2000  | 7.505     | 99.99   |
-| 3000  | 4.986     | 99.99   |
-| 4000  | 3.284     | 99.99   |
-| 5000  | 2.880     | 99.99   |
-| 6000  | 2.819     | 99.99   |
-| 7000  | 2.746     | 99.99   |
-| 8000  | 1.164     | 85.65   |
-| 9000  | 0.634     | 66.24   |
-| 10000 | 0.419     | 56.65   |
-| 11000 | 0.332     | 48.98   |
-| 12000 | 0.290     | 44.82   |
-| 13000 | 0.265     | 41.41   |
-| 14000 | 0.248     | 39.06   |
-| 15000 | 0.240     | 37.38   |
-| 16000 | 0.229     | 36.15   |
-| 17000 | 0.217     | 34.58   |
-| 18000 | 0.211     | 34.10   |
-| 19000 | 0.207     | 33.06   |
-| 20000 | 0.199     | 32.45   |
-| 21000 | 0.193     | 31.75   |
-| 22000 | 0.188     | 31.00   |
-| 23000 | 0.183     | 30.45   |
-| 24000 | 0.181     | 30.08   |
-| 25000 | 0.175     | 29.49   |
-| 26000 | 0.173     | 29.35   |
-| 27000 | 0.170     | 29.01   |
-| 28000 | 0.166     | 28.64   |
-| 29000 | 0.165     | 28.53   |
-| 30000 | 0.165     | 28.30   |
-| 31000 | 0.163     | 27.83   |
-| 32000 | 0.161     | 27.79   |
-| 33000 | 0.157     | 27.42   |
-| 34000 | 0.155     | 27.09   |
-| 35000 | 0.156     | 26.95   |
-| 36000 | 0.153     | 26.84   |
-| 37000 | 0.151     | 26.71   |
-| 38000 | 0.149     | 26.50   |
-| 39000 | 0.148     | 26.35   |
-| 40000 | 0.149     | 26.14   |
-| 41000 | 0.147     | 25.92   |
-| 42000 | 0.145     | 26.04   |
-| 43000 | 0.145     | 26.02   |
-| 44000 | 0.146     | 25.94   |
-| 45000 | 0.145     | 25.81   |
 
 ### Framework versions
 
@@ -80,30 +26,73 @@ The following hyperparameters were used during training:
 - Datasets 3.3.2
 - Tokenizers 0.21.0
 
-## Test results
-
-Map: 100%|██████████| 16359/16359 [09:32<00:00, 28.58 examples/s]
-
-Test WER: 0.137
-
-Test CER: 0.024
-
 ### Sample predictions: 
 
-Reference: honek garrantzi handia zuen ehun urteko gerran 
-Prediction: honek garrantzi handia zuen neun urteko gerran 
+Test CV WER: 0.074
 
-Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
-Prediction: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+Test CV CER: 0.013
 
-Reference: irungo familia boteretsu bat da olazabal familia
-Prediction: eirungo familia goteretsu bat da olazabal familia
+Sample predictions:
 
-Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
-Prediction: hezkuntzak prestatu zituen probak isa eta antzekoak ere du
+- Reference: honek garrantzi handia zuen ehun urteko gerran
+- Prediction: honek garrantzi handia zuen eun urteko gerran
 
-Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
-Prediction: bestalde botileka ban bardiako diseinu originalak dituzte
+- Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+- Prediction: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+
+- Reference: irungo familia boteretsu bat da olazabal familia
+- Prediction: irungo familia boteretsu bat da olazabal familia
+
+- Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+- Prediction: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+
+- Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
+- Prediction: bestalde botillek abanbardiako diseinu originalak dituzte
+
+--------------
+
+Test Parl WER: 0.068
+
+Test Parl CER: 0.018
+
+Sample predictions:
+
+- Reference: por iñigo cabacas eskerrik asko eskerrik asko
+- Prediction: por inigo cabacas eskerrik asko eskerrik asko
+
+- Reference: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+- Prediction: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+
+- Reference: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+- Prediction: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+
+- Reference: eginda da eginikoa da ea gaurko adostasunak
+- Prediction: eginda da eginekoa da ea gaurko adostasunak
+
+- Reference: kontatu gabe eta udalen ordezkarien izenean izena joan gabe
+- Prediction: kontatu gabe eta udalen ordezkarien izenea izenean joan gabe
+
+--------------
+
+Test OSLR WER: 0.204
+
+Test OSLR CER: 0.042
+
+Sample predictions:
+- Reference: new yorkeko aireportuan eskala egin genuen kaliforniara bidean
+- Prediction: new yyorkeko aireportua neskala egin genuen kaliforniara bidean
+
+- Reference: janet jackson michael jackson abeslari ospetsuaren arreba da
+- Prediction: janez jason mikel jaxon abeslari ospetsuaren arreba da
+
+- Reference: londreseko heathrow aireportua munduko handienetarikoena da
+- Prediction: londreseko hitrow aireportua munduko handienetarikoa da
+
+- Reference: hamabietan izango da txupinazoa eta udaletxeko balkoitik botako dute urtero bezala
+- Prediction: hamabitan izango da txupinasoa eta udaletxeko palkoitik botako dute urtero bezala
+
+- Reference: motorolaren telefono berria erostekotan nabil
+- Prediction: motrolaren telefono berria erostekotan nabil
 
 
 ## How to use
