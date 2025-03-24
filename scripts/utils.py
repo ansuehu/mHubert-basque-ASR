@@ -5,7 +5,6 @@ from transformers import (
     Wav2Vec2FeatureExtractor,
     Wav2Vec2Processor,
 )
-from jiwer import wer
 
 def compute_metrics(pred, processor, wer_metric, cer_metric):
     """Compute Word Error Rate (WER) metric."""

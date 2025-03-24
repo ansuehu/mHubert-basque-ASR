@@ -39,25 +39,17 @@ def evaluate_model(data, model, processor):
     wer_metric = load("wer", trust_remote_code=True)
     cer_metric = load("cer", trust_remote_code=True)
 
-    test_wer = wer_metric.compute(predictions=results["pred_str"], references=results["text"])
-    test_cer = cer_metric.compute(predictions=results["pred_str"], references=results["text"])
+    metric = {}
 
-    print(f"\nTest WER: {test_wer:.3f}")
-    print(f"\nTest CER: {test_cer:.3f}")
-    
-    # Display sample predictions
-    print("\nSample predictions:")
-    for i in range(min(5, len(results))):
-        print(f"Reference: {results['text'][i]}")
-        print(f"Prediction: {results['pred_str'][i]}")
-        print("---")
-    
-    return results
+    metric['test_wer'] = wer_metric.compute(predictions=results["pred_str"], references=results["text"])
+    metric['test_cer'] = cer_metric.compute(predictions=results["pred_str"], references=results["text"])
+   
+    return results, metric
 
 def main():
     
     print('Starting evaluation')
-    model_name = '/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert_basque/checkpoint-45000'
+    model_name = '/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-146000'
 
     tokenizer = Wav2Vec2CTCTokenizer(
         '/home/andoni.sudupe/mHubert_finetune/data/vocab.json', 
@@ -77,10 +69,45 @@ def main():
     data = load_data('/home/andoni.sudupe/mHubert_finetune/data/preprocessed_data')
     # 6. Evaluate model
     print("\nStep 6: Evaluating model...")
-    evaluate_model(data['test'], model, processor)
+    results, metric = evaluate_model(data['test_cv'], model, processor)
+
+    print(f"\nTest CV WER: {metric['test_wer']:.3f}")
+    print(f"\nTest CV CER: {metric['test_cer']:.3f}")
     
-    # print("\nSpeech recognition pipeline completed!")
-    # print(f"Final WER: {wer(hypothesis=results['test']['pred_str'], reference=results['test']['text']):.3f}")
+    # Display sample predictions
+    print("\nSample predictions:")
+    for i in range(min(5, len(results))):
+        print(f"Reference: {results['text'][i]}")
+        print(f"Prediction: {results['pred_str'][i]}")
+        print("---")
+
+    print('--------------')
+
+    results, metric = evaluate_model(data['test_parl'], model, processor)
+
+    print(f"\nTest Parl WER: {metric['test_wer']:.3f}")
+    print(f"\nTest Parl CER: {metric['test_cer']:.3f}")
+    
+    # Display sample predictions
+    print("\nSample predictions:")
+    for i in range(min(5, len(results))):
+        print(f"Reference: {results['text'][i]}")
+        print(f"Prediction: {results['pred_str'][i]}")
+        print("---")
+    
+    print('--------------')
+
+    results, metric = evaluate_model(data['test_oslr'], model, processor)
+
+    print(f"\nTest OSLR WER: {metric['test_wer']:.3f}")
+    print(f"\nTest OSLR CER: {metric['test_cer']:.3f}")
+    
+    # Display sample predictions
+    print("\nSample predictions:")
+    for i in range(min(5, len(results))):
+        print(f"Reference: {results['text'][i]}")
+        print(f"Prediction: {results['pred_str'][i]}")
+        print("---")
 
 if __name__ == "__main__":
     main()

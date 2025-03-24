@@ -12,7 +12,6 @@ from scripts.utils import setup_processor, compute_metrics, load_data
 from evaluate import load
 
 
-# Define the data collator class for CTC
 @dataclass
 class DataCollatorCTCWithPadding:
     """
@@ -97,7 +96,7 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
         per_device_train_batch_size=64,
         per_device_eval_batch_size=4,
         eval_strategy="steps",
-        num_train_epochs=10,
+        num_train_epochs=30,
         fp16=False,
         save_steps=1000,
         eval_steps=1000,
@@ -135,8 +134,8 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
     trainer.train()
        
     # Push to HuggingFace Hub if credentials are available
-    if push_to_hub:
-        trainer.push_to_hub()
+    if push_to_hub != None:
+        trainer.push_to_hub(token=push_to_hub)
         print(f"Model pushed to HuggingFace Hub: {output_dir}")
     
     
@@ -159,11 +158,11 @@ def main():
 
     # 2. Train model
     print("\nStep 2: Training model...")
-    model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=True, output_dir='checkpoints/mHubert-ASR-eu')
+    model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=False, output_dir='checkpoints/mHubert-basque-ASR-30ep', push_to_hub='...')
 
-    # 3. Save model
-    print("\nStep 3: Saving model...")
-    model.save_pretrained("checkpoints/hubert-finetuned-eu")
+    # # 3. Save model
+    # print("\nStep 3: Saving model...")
+    # model.save_pretrained("checkpoints/hubert-finetuned-eu")
     
 if __name__ == "__main__":
     main()

@@ -1,0 +1,286 @@
+------------------ mHUBERT 7 epoch -----------------------
+
+Map: 100%|██████████| 14312/14312 [08:41<00:00, 27.46 examples/s]
+
+Test CV WER: 0.134
+
+Test CV CER: 0.022
+
+Sample predictions:
+Reference: honek garrantzi handia zuen ehun urteko gerran
+Prediction: honek garrantzi handia zuen neun urteko gerran
+---
+Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+Prediction: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+---
+Reference: irungo familia boteretsu bat da olazabal familia
+Prediction: eirungo familia goteretsu bat da olazabal familia
+---
+Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+Prediction: hezkuntzak prestatu zituen probak isa eta antzekoak ere du
+---
+Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
+Prediction: bestalde botileka ban bardiako diseinu originalak dituzte
+
+--------------
+
+Map: 100%|██████████| 1521/1521 [01:01<00:00, 24.55 examples/s]
+
+Test Parl WER: 0.129
+
+Test Parl CER: 0.027
+
+Sample predictions:
+Reference: por iñigo cabacas eskerrik asko eskerrik asko
+Prediction: por iñigo cabacas eskerrik asko eskerrik asko
+---
+Reference: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+Prediction: eta ikusita obra hau hamar urtetan bueltaka ibili dela rekusten da zaharkitutako
+---
+Reference: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+Prediction: dena legearen garapen zuzena oztopatzeko helburuarekin ez du nik esango ez eskatzaile guztiek
+---
+Reference: eginda da eginikoa da ea gaurko adostasunak
+Prediction: egindada eginekoa da ea gaurko adostasunak
+---
+Reference: kontatu gabe eta udalen ordezkarien izenean izena joan gabe
+Prediction: kontatu gabe eta udalen ordezkarien izenea izenean joan gabe
+
+--------------
+
+Map: 100%|██████████| 526/526 [00:22<00:00, 23.16 examples/s]
+
+Test OSLR WER: 0.267
+
+Test OSLR CER: 0.055
+
+Sample predictions:
+Reference: new yorkeko aireportuan eskala egin genuen kaliforniara bidean
+Prediction: niu jorkeko aire portuan eskal aegin genuen kaliforniarabidean
+---
+Reference: janet jackson michael jackson abeslari ospetsuaren arreba da
+Prediction: jane jacxon maycel jacxon abeslari ospesuaren arreba da
+---
+Reference: londreseko heathrow aireportua munduko handienetarikoena da
+Prediction: londreseko itroua ireportua munduko handienetarikoa da
+---
+Reference: hamabietan izango da txupinazoa eta udaletxeko balkoitik botako dute urtero bezala
+Prediction: hamabietan izango da txupinasoa eta udaletzeko palkoitik botako dute urtero bezala
+---
+Reference: motorolaren telefono berria erostekotan nabil
+Prediction: motrolaren telefono berria erostekotan nabil
+---
+
+
+------------------ Hubert 10 epoch -----------------------
+
+Map: 100%|██████████| 14312/14312 [08:32<00:00, 27.91 examples/s]
+
+Test CV WER: 0.212
+
+Test CV CER: 0.037
+
+Sample predictions:
+Reference: honek garrantzi handia zuen ehun urteko gerran
+Prediction: honek garrantzi handia zuen nehun urtekogerran
+---
+Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+Prediction: osasuna aurkari zuzena la eta beraz puntuek balio bikoitza dute
+---
+Reference: irungo familia boteretsu bat da olazabal familia
+Prediction: eirugo familia boteraitsu bat da olazobal familia
+---
+Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+Prediction: hezkuntzak prestatu zituen probak isaeta antzekoak ere du
+---
+Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
+Prediction: estalde botilekabanbardiako diseinu diginanak dituzte
+
+--------------
+
+Map: 100%|██████████| 1521/1521 [00:59<00:00, 25.43 examples/s]
+
+Test Parl WER: 0.188
+
+Test Parl CER: 0.038
+
+Sample predictions:
+Reference: por iñigo cabacas eskerrik asko eskerrik asko
+Prediction: porimigo cabacas eskerrik asko eskerrik asko
+---
+Reference: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+Prediction: eta ikusita abr hau hamar urtetan bueltakaibili dela edeikusten da zaharkitutako
+---
+Reference: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+Prediction: dena legearen garapen zuzena oztopatzeko helburuarekin ez du nik esangoez eskatzaile guztiek
+---
+Reference: eginda da eginikoa da ea gaurko adostasunak
+Prediction: eginda da egineko da ea gaurko adostasunak
+---
+Reference: kontatu gabe eta udalen ordezkarien izenean izena joan gabe
+Prediction: kontatu gabe eta audalen ordezkarien izenea izenean joan gabe
+
+--------------
+
+Map: 100%|██████████| 526/526 [00:21<00:00, 24.16 examples/s]
+
+Test OSLR WER: 0.321
+
+Test OSLR CER: 0.068
+
+Sample predictions:
+Reference: new yorkeko aireportuan eskala egin genuen kaliforniara bidean
+Prediction: niu jorkeko aireportuan eskal agin genuen kaliforniarabidean
+---
+Reference: janet jackson michael jackson abeslari ospetsuaren arreba da
+Prediction: jane jaxon mahaikel jakxo nabeslari ospetsuaren arrebada
+---
+Reference: londreseko heathrow aireportua munduko handienetarikoena da
+Prediction: londrezeko gitroaua ire portua munduko handienetarikoa da
+---
+Reference: hamabietan izango da txupinazoa eta udaletxeko balkoitik botako dute urtero bezala
+Prediction: hamabetan izango datxupinasoa eta udaletzeko palkoitik botako dute urtero bezala
+---
+Reference: motorolaren telefono berria erostekotan nabil
+Prediction: motrolaren telefono berria erostekotan nabil
+---
+
+------------------ mHubert 13 epoch 83000 step -----------------------
+
+Map: 100%|██████████| 14312/14312 [08:30<00:00, 28.02 examples/s]
+
+Test CV WER: 0.090
+
+Test CV CER: 0.015
+
+Sample predictions:
+Reference: honek garrantzi handia zuen ehun urteko gerran
+Prediction: honek garrantzi handia zuen ehun urteko gerran
+---
+Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+Prediction: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+---
+Reference: irungo familia boteretsu bat da olazabal familia
+Prediction: irungo familia boteretsu bat da olazabal familia
+---
+Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+Prediction: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+---
+Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
+Prediction: bestalde botillekabanbardiako diseinu originalak dituzte
+
+--------------
+
+Map: 100%|██████████| 1521/1521 [00:59<00:00, 25.53 examples/s]
+
+Test Parl WER: 0.081
+
+Test Parl CER: 0.019
+
+Sample predictions:
+Reference: por iñigo cabacas eskerrik asko eskerrik asko
+Prediction: por iñigo cabacas eskerrik asko eskerrik asko
+---
+Reference: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+Prediction: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+---
+Reference: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+Prediction: dena legearen garapen zuzena oztopatzeko helburuarekin ez du nik esango ez eskatzaile guztiek
+---
+Reference: eginda da eginikoa da ea gaurko adostasunak
+Prediction: eginda da eginekoa da ea gaurko adostasunak
+---
+Reference: kontatu gabe eta udalen ordezkarien izenean izena joan gabe
+Prediction: kontatu gabe eta udalen ordezkarien izenea izenean joan gabe
+---
+--------------
+
+Map: 100%|██████████| 526/526 [00:21<00:00, 24.13 examples/s]
+
+Test OSLR WER: 0.219
+
+Test OSLR CER: 0.045
+
+Sample predictions:
+Reference: new yorkeko aireportuan eskala egin genuen kaliforniara bidean
+Prediction: niw yorkeko aireportua neskala egin genuen kaliforniara bidean
+---
+Reference: janet jackson michael jackson abeslari ospetsuaren arreba da
+Prediction: janed jason maykel jason abeslari ospetsuaren arreba da
+---
+Reference: londreseko heathrow aireportua munduko handienetarikoena da
+Prediction: londreseko hitrow ireportua munduko handienetarikoa da
+---
+Reference: hamabietan izango da txupinazoa eta udaletxeko balkoitik botako dute urtero bezala
+Prediction: hamabitan izango da txupinasoa eta udaletxeko palkoitik botako dute urtero bezala
+---
+Reference: motorolaren telefono berria erostekotan nabil
+Prediction: motrolaren telefono berria erostekotan nabil
+---
+
+------------------ mHubert 24 epoch 146000 step -----------------------
+
+Test CV WER: 0.074
+
+Test CV CER: 0.013
+
+Sample predictions:
+Reference: honek garrantzi handia zuen ehun urteko gerran
+Prediction: honek garrantzi handia zuen eun urteko gerran
+---
+Reference: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+Prediction: osasuna aurkari zuzena da eta beraz puntuek balio bikoitza dute
+---
+Reference: irungo familia boteretsu bat da olazabal familia
+Prediction: irungo familia boteretsu bat da olazabal familia
+---
+Reference: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+Prediction: hezkuntzak prestatu zituen probak pisa eta antzekoak eredu
+---
+Reference: bestalde botilek abangoardiako diseinu orijinalak dituzte
+Prediction: bestalde botillek abanbardiako diseinu originalak dituzte
+---
+--------------
+
+Test Parl WER: 0.068
+
+Test Parl CER: 0.018
+
+Sample predictions:
+Reference: por iñigo cabacas eskerrik asko eskerrik asko
+Prediction: por inigo cabacas eskerrik asko eskerrik asko
+---
+Reference: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+Prediction: eta ikusita obra hau hamar urteetan bueltaka ibili dela eta ikusten da zaharkitutako
+---
+Reference: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+Prediction: dena legearen garapen zuzena oztopatzeko helburuarekin ez dut nik esango ez eskatzaile guztiek
+---
+Reference: eginda da eginikoa da ea gaurko adostasunak
+Prediction: eginda da eginekoa da ea gaurko adostasunak
+---
+Reference: kontatu gabe eta udalen ordezkarien izenean izena joan gabe
+Prediction: kontatu gabe eta udalen ordezkarien izenea izenean joan gabe
+---
+--------------
+
+Test OSLR WER: 0.204
+
+Test OSLR CER: 0.042
+
+Sample predictions:
+Reference: new yorkeko aireportuan eskala egin genuen kaliforniara bidean
+Prediction: new yyorkeko aireportua neskala egin genuen kaliforniara bidean
+---
+Reference: janet jackson michael jackson abeslari ospetsuaren arreba da
+Prediction: janez jason mikel jaxon abeslari ospetsuaren arreba da
+---
+Reference: londreseko heathrow aireportua munduko handienetarikoena da
+Prediction: londreseko hitrow aireportua munduko handienetarikoa da
+---
+Reference: hamabietan izango da txupinazoa eta udaletxeko balkoitik botako dute urtero bezala
+Prediction: hamabitan izango da txupinasoa eta udaletxeko palkoitik botako dute urtero bezala
+---
+Reference: motorolaren telefono berria erostekotan nabil
+Prediction: motrolaren telefono berria erostekotan nabil
+---
