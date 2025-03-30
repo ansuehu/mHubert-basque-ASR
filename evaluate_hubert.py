@@ -49,7 +49,7 @@ def evaluate_model(data, model, processor):
 def main():
     
     print('Starting evaluation')
-    model_name = '/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-146000'
+    model_name = '/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700'
 
     tokenizer = Wav2Vec2CTCTokenizer(
         '/home/andoni.sudupe/mHubert_finetune/data/vocab.json', 
