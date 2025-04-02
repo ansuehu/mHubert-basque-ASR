@@ -69,6 +69,7 @@ def main():
         split=args.split,
     )
     
+    dataset = dataset['train']
     # Ensure dataset has audio format
     if not any(column.startswith("audio") for column in dataset.column_names):
         print("Adding audio column to dataset...")
