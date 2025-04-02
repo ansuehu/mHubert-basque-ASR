@@ -9,6 +9,7 @@ from transformers import (
     Wav2Vec2Processor,
     HubertForCTC,
 )
+import argparse
 
 def map_to_result(batch, model, processor):
     """Map model predictions to text for evaluation."""
@@ -47,67 +48,72 @@ def evaluate_model(data, model, processor):
     return results, metric
 
 def main():
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="Evaluate Basque Speech Recognition Model")
+    
+    # Model parameters
+    parser.add_argument("--model_path", type=str, 
+                        default="/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700",
+                        help="Path to the model checkpoint for evaluation")
+    parser.add_argument("--vocab_path", type=str,
+                        default="/home/andoni.sudupe/mHubert_finetune/data/vocab.json",
+                        help="Path to the vocabulary JSON file")
+    parser.add_argument("--data_dir", type=str,
+                        default="/home/andoni.sudupe/mHubert_finetune/data/preprocessed_data",
+                        help="Directory containing preprocessed evaluation data")
+    parser.add_argument("--datasets", type=str, nargs="+", 
+                        default=["test_cv", "test_parl", "test_oslr"],
+                        help="List of test datasets to evaluate")
+    
+    # Parse arguments
+    args = parser.parse_args()
     
     print('Starting evaluation')
-    model_name = '/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700'
-
+    print(f'Model path: {args.model_path}')
+    print(f'Evaluating on datasets: {args.datasets}')
+    
+    # Initialize tokenizer
     tokenizer = Wav2Vec2CTCTokenizer(
-        '/home/andoni.sudupe/mHubert_finetune/data/vocab.json', 
+        args.vocab_path, 
         unk_token="[UNK]", 
         pad_token="[PAD]", 
         word_delimiter_token="|"
     )
 
     # Initialize feature extractor
-    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_name)
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(args.model_path)
 
     # Combine into processor
     processor = Wav2Vec2Processor(feature_extractor=feature_extractor, tokenizer=tokenizer)
 
-    model = HubertForCTC.from_pretrained(model_name, local_files_only=True)
+    # Load model
+    model = HubertForCTC.from_pretrained(args.model_path, local_files_only=True)
 
-    data = load_data('/home/andoni.sudupe/mHubert_finetune/data/preprocessed_data')
-    # 6. Evaluate model
-    print("\nStep 6: Evaluating model...")
-    results, metric = evaluate_model(data['test_cv'], model, processor)
-
-    print(f"\nTest CV WER: {metric['test_wer']:.3f}")
-    print(f"\nTest CV CER: {metric['test_cer']:.3f}")
+    # Load data
+    data = load_data(args.data_dir)
     
-    # Display sample predictions
-    print("\nSample predictions:")
-    for i in range(min(5, len(results))):
-        print(f"Reference: {results['text'][i]}")
-        print(f"Prediction: {results['pred_str'][i]}")
-        print("---")
+    # Evaluate on each specified test dataset
+    for dataset_name in args.datasets:
+        if dataset_name not in data:
+            print(f"\nWarning: Dataset '{dataset_name}' not found in loaded data. Skipping.")
+            continue
+            
+        print(f"\n{'-' * 50}")
+        print(f"Evaluating on {dataset_name}...")
+        
+        # Evaluate model on this dataset
+        results, metric = evaluate_model(data[dataset_name], model, processor)
 
-    print('--------------')
-
-    results, metric = evaluate_model(data['test_parl'], model, processor)
-
-    print(f"\nTest Parl WER: {metric['test_wer']:.3f}")
-    print(f"\nTest Parl CER: {metric['test_cer']:.3f}")
-    
-    # Display sample predictions
-    print("\nSample predictions:")
-    for i in range(min(5, len(results))):
-        print(f"Reference: {results['text'][i]}")
-        print(f"Prediction: {results['pred_str'][i]}")
-        print("---")
-    
-    print('--------------')
-
-    results, metric = evaluate_model(data['test_oslr'], model, processor)
-
-    print(f"\nTest OSLR WER: {metric['test_wer']:.3f}")
-    print(f"\nTest OSLR CER: {metric['test_cer']:.3f}")
-    
-    # Display sample predictions
-    print("\nSample predictions:")
-    for i in range(min(5, len(results))):
-        print(f"Reference: {results['text'][i]}")
-        print(f"Prediction: {results['pred_str'][i]}")
-        print("---")
+        # Print metrics
+        print(f"\n{dataset_name.upper()} WER: {metric['test_wer']:.3f}")
+        print(f"{dataset_name.upper()} CER: {metric['test_cer']:.3f}")
+        
+        # Display sample predictions
+        print(f"\nSample predictions for {dataset_name}:")
+        for i in range(min(args.num_samples, len(results))):
+            print(f"Reference: {results['text'][i]}")
+            print(f"Prediction: {results['pred_str'][i]}")
+            print("---")
 
 if __name__ == "__main__":
     main()

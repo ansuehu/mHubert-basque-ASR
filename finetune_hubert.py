@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 from scripts.utils import setup_processor, compute_metrics, load_data
 from evaluate import load
-
+import argparse
 
 @dataclass
 class DataCollatorCTCWithPadding:
@@ -218,33 +218,95 @@ def continue_train_model(model_name, data_train, data_dev, processor, ctc_only =
     
     return model
 
+
 def main():
-    """Main function to orchestrate the entire pipeline."""
+    """Main function to orchestrate the entire Basque Speech Recognition pipeline."""
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="Basque Speech Recognition Pipeline")
+
+    # Data parameters
+    parser.add_argument("--data_dir", type=str, default="data/preprocessed_data", 
+                        help="Directory containing preprocessed data")
+    parser.add_argument("--split", type=str, default="All", 
+                        help="Data split to use (train, dev, test, or All)")
+    parser.add_argument("--sample_size", type=int, default=None, 
+                        help="Sample size for training data (None for all data)")
+    
+    # Model parameters
+    parser.add_argument("--model_name", type=str, 
+                        default="utter-project/mHuBERT-147",
+                        help="Pre-trained model name or path to local model")
+    parser.add_argument("--continue_training", action="store_true", 
+                        help="Continue training from a checkpoint")
+    parser.add_argument("--ctc_only", action="store_true", 
+                        help="Use CTC loss only (no language model)")
+    
+    # Output parameters
+    parser.add_argument("--output_dir", type=str, 
+                        default="checkpoints/mHubert-basque-ASR",
+                        help="Directory to save model checkpoints")
+    parser.add_argument("--push_to_hub", type=str, default=None,
+                        help="Repository name to push model to HuggingFace Hub (None to disable)")
+    
+    # Training parameters
+    parser.add_argument("--learning_rate", type=float, default=3e-4,
+                        help="Learning rate for training")
+    parser.add_argument("--batch_size", type=int, default=8,
+                        help="Batch size for training")
+    parser.add_argument("--epochs", type=int, default=30,
+                        help="Number of training epochs")
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=2,
+                        help="Number of updates steps to accumulate before performing a backward/update pass")
+
+    # Parse arguments
+    args = parser.parse_args()
+
     print("Starting Basque Speech Recognition Pipeline")
     print("-------------------------------------------")
     
     # 1. Load and prepare data
-    print("\nStep 1: Loading and preparing data...")
-
-    sample_size=None
-    data = load_data('data/preprocessed_data', split='All', sample_size=sample_size)
+    print(f"\nStep 1: Loading and preparing data from {args.data_dir}...")
+    data = load_data(args.data_dir, split=args.split, sample_size=args.sample_size)
     
-    # model_name = "utter-project/mHuBERT-147"
-    model_name = "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-146000"
-
-
-    processor, _ = setup_processor(model_name)
-
-    # processor = Wav2Vec2Processor.from_pretrained(model_name)
-
+    # Set up processor
+    processor, _ = setup_processor(args.model_name)
+    
     # 2. Train model
     print("\nStep 2: Training model...")
-    # model = train_model(model_name, data['train'], data['dev'], processor, ctc_only=False, output_dir='checkpoints/mHubert-basque-ASR-30ep', push_to_hub='...')
-    model = continue_train_model(model_name, data['train'], data['dev'], processor, ctc_only=False, output_dir='checkpoints/mHubert-basque-ASR-30ep', push_to_hub='...')
-
-    # # 3. Save model
-    # print("\nStep 3: Saving model...")
-    # model.save_pretrained("checkpoints/hubert-finetuned-eu")
+    if args.continue_training:
+        print(f"Continuing training from checkpoint: {args.model_name}")
+        model = continue_train_model(
+            args.model_name, 
+            data['train'], 
+            data['dev'], 
+            processor, 
+            ctc_only=args.ctc_only, 
+            output_dir=args.output_dir, 
+            push_to_hub=args.push_to_hub,
+            learning_rate=args.learning_rate,
+            batch_size=args.batch_size,
+            num_train_epochs=args.epochs,
+            gradient_accumulation_steps=args.gradient_accumulation_steps
+        )
+    else:
+        print(f"Starting training from pre-trained model: {args.model_name}")
+        model = train_model(
+            args.model_name, 
+            data['train'], 
+            data['dev'], 
+            processor, 
+            ctc_only=args.ctc_only, 
+            output_dir=args.output_dir, 
+            push_to_hub=args.push_to_hub,
+            learning_rate=args.learning_rate,
+            batch_size=args.batch_size,
+            num_train_epochs=args.epochs,
+            gradient_accumulation_steps=args.gradient_accumulation_steps
+        )
+    
+    # 3. Save final model
+    print(f"\nStep 3: Saving final model to {args.output_dir}...")
+    model.save_pretrained(f"{args.output_dir}/final")
     
 if __name__ == "__main__":
     main()
