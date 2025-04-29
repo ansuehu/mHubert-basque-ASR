@@ -14,10 +14,11 @@
 # Activate virtual environment
 source ~/envs/myenv/bin/activate
 
+cd /home/andoni.sudupe/mHubert_finetune
+
 # Run the feature extraction script with command line arguments for HuggingFace dataset
-srun python -u ./extract_features_huggingface.py \
-    --model_name "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700" \
+srun python -u scripts/kmeans/extract_features.py \
+    --model_name "Ansu/mHubert-basque-ASR" \
     --dataset_path "data/raw_data" \
     --output_file "hubert_basque_features.npy" \
-    --batch_size 16 \
-    --local_files_only
+    --batch_size 16

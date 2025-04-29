@@ -3,15 +3,16 @@ import os
 import numpy as np
 import torch
 from transformers import Wav2Vec2Processor, HubertModel
-from datasets import load_dataset, Audio
-from scripts.utils import load_data
+from datasets import load_dataset, Audio, load_from_disk
+from tqdm import tqdm
 
 def extract_features_batch(batch, model, processor, device):
    
+    batch_audio = [b["array"] for b in batch] 
     # Process the audio inputs
     inputs = processor(
-        batch["audio"]["array"], 
-        sampling_rate=batch["audio"]["sampling_rate"],
+        batch_audio, 
+        sampling_rate=batch[0]["sampling_rate"],
         return_tensors="pt", 
         padding="longest"
     ).to(device)
@@ -64,9 +65,8 @@ def main():
     
     # Load dataset
     print(f"Loading dataset {args.dataset_path}...")
-    dataset = load_data(
+    dataset = load_from_disk(
         args.dataset_path, 
-        split=args.split,
     )
     
     dataset = dataset['train']
@@ -87,16 +87,15 @@ def main():
         batch_size = end_idx - i
         
         print(f"Processing batch {batch_idx+1}/{total_batches} (samples {i}-{end_idx-1})...")
-        
-        try:
+        # try:
             # Get batch and extract features
-            batch = dataset[i:end_idx]
-            features = extract_features_batch(batch, model, processor, device)
-            features_list.append(features)
-            
-            print(f"  Processed {batch_size} samples, feature shape: {features.shape}")
-        except Exception as e:
-            print(f"  Error processing batch {batch_idx+1}: {str(e)}")
+        batch = dataset[i:end_idx]
+        features = extract_features_batch(batch['audio'], model, processor, device)
+        features_list.append(features)
+        
+        print(f"  Processed {batch_size} samples, feature shape: {features.shape}")
+        # except Exception as e:
+        #     print(f"  Error processing batch {batch_idx+1}: {str(e)}")
     
     if features_list:
         # Concatenate all features
