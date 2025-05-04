@@ -19,6 +19,5 @@ cd /home/andoni.sudupe/mHubert_finetune
 # Run the feature extraction script with command line arguments for HuggingFace dataset
 srun python -u scripts/kmeans/extract_features.py \
     --model_name "Ansu/mHubert-basque-ASR" \
-    --dataset_path "data/raw_data" \
-    --output_file "hubert_basque_features.npy" \
-    --batch_size 16
+    --dataset_path "data/composite_eu/preprocessed_data" \
+    --output_file "data/composite_eu/hubert_basque_features.npy" \
