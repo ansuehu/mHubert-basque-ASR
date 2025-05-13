@@ -1,12 +1,13 @@
 from datasets import load_from_disk, Audio, concatenate_datasets
 import re
 import json
-from scripts.utils import setup_processor
+import os
+from utils import *
 import os
 
 def remove_special_characters(batch):
     """Remove special characters from text."""
-    chars_to_ignore_regex = r'[\,\?\.\!\-\;\:\"\'\'\'\`\'\±\ã\]'
+    chars_to_ignore_regex = r'[,\?\.\!\-\;\:\"\'\'\'\`\'\±\ã\¿\¡\|]'
     batch["sentence"] = re.sub(chars_to_ignore_regex, '', batch["sentence"]).lower()
     return batch
 
@@ -29,10 +30,10 @@ def prepare_dataset(batch, processor):
         batch["labels"] = processor(batch["sentence"]).input_ids
     return batch
 
-def load_and_prepare_data(sample_size=None):
+def load_and_prepare_data(data_name, sample_size=None):
     """Load and prepare the Basque Common Voice dataset."""
     # Load the dataset
-    data = load_from_disk('data/raw_data')
+    data = load_from_disk(data_name)
     print(f"Original dataset size: {len(data)}")
     
     # Take a subset of the dataset
@@ -53,7 +54,7 @@ def load_and_prepare_data(sample_size=None):
     
     return data
 
-def create_vocabulary(data, save = True):
+def create_vocabulary(data, dataset, save = True):
     """Create and save vocabulary from the dataset."""
     # Extract all unique characters to create vocabulary
     vocabs = data.map(
@@ -90,7 +91,7 @@ def create_vocabulary(data, save = True):
     
     # Save vocabulary to JSON file
     if save:
-        with open('./data/vocab.json', 'w') as vocab_file:
+        with open(f'./data/{dataset}/vocab.json', 'w') as vocab_file:
             json.dump(vocab_dict, vocab_file)
     
     print("Vocabulary saved to vocab.json")
@@ -116,20 +117,23 @@ def main():
     """Main function to orchestrate the dataset preprocessing."""
     print("Starting Dataset preprocessing")
     print("-------------------------------------------")
+    os.chdir('/home/andoni.sudupe/mHubert_finetune')
     
     model_name = "utter-project/mHuBERT-147"
     # 1. Load and prepare data
     print("\nStep 1: Loading and preparing data...")
+    dataset = 'composite_eues'
+    data_name = f'/home/andoni.sudupe/mHubert_finetune/data/{dataset}/raw_data'
     sample_size = None
-    data = load_and_prepare_data(sample_size)
+    data = load_and_prepare_data(data_name, sample_size)
     
     # 2. Create vocabulary
     print("\nStep 2: Creating vocabulary...")
-    create_vocabulary(data)
+    create_vocabulary(data, dataset)
     
     # 3. Setup processor
     print("\nStep 3: Setting up processor...")
-    processor, sampling_rate = setup_processor(model_name)
+    processor, sampling_rate = setup_processor(model_name, vocab_path=f"./data/{dataset}/vocab.json")
     
     # 4. Process audio data
     print("\nStep 4: Processing audio data...")
@@ -147,7 +151,7 @@ def main():
     #         del data[k]
 
     print("\nStep 5: Saving data...")
-    data.save_to_disk(os.path.join('data', 'preprocessed_data'))
+    data.save_to_disk(os.path.join('data', dataset, 'preprocessed_data'))
 
 if __name__ == "__main__":
     main()

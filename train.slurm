@@ -12,7 +12,7 @@
 #SBATCH --chdir=/home/andoni.sudupe/mHubert_finetune
 
 # Activate virtual environment
-source ~/envs/myenv/bin/activate
+conda activate hubert
 
 # Choose one of the following commands based on your needs:
 

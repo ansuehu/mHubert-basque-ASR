@@ -5,23 +5,10 @@ import torch
 from transformers import Wav2Vec2Processor, HubertModel
 from datasets import load_dataset, Audio, load_from_disk
 from tqdm import tqdm
-
-def extract_features_batch(audio, model, device, target_length=12*16000):
-    # Pad or truncate audio arrays to the target length
-    array = audio["input_values"]
-    if len(array) < target_length:
-        array = np.pad(array, (0, target_length - len(array)), mode='constant')
-    else:
-        array = array[:target_length]
-
-    input_values = torch.tensor(array, dtype=torch.float32).unsqueeze(0).to(device)
-
-    with torch.no_grad():
-        outputs = model(input_values, output_hidden_states=True)
-
-    features = outputs.hidden_states[9].cpu().numpy()
-    return features
-
+import time
+from torch.nn.utils.rnn import pad_sequence
+from torch.utils.data import DataLoader
+from npy_append_array import NpyAppendArray
 
 def main():
     # Create argument parser
@@ -34,8 +21,12 @@ def main():
                         help="HuggingFace dataset name or path to local dataset")
     parser.add_argument("--split", type=str, default="All",
                         help="Dataset split to process (train, validation, test)")
-    parser.add_argument("--output_file", type=str, default="hubert_features.npy",
-                        help="Output file to save extracted features")
+    parser.add_argument("--batch_size", type=int, default=16,
+                        help="Batch Size for processing")
+    parser.add_argument("--feat_file", type=str, required=True,
+                        help="Output file for extracted features")
+    parser.add_argument("--len_file", type=str, required=True,
+                        help="Output file for lengths of extracted features")
     parser.add_argument("--local_files_only", action="store_true",
                         help="Use only local files for loading model and dataset")
     
@@ -51,6 +42,7 @@ def main():
     
     # Load model and processor
     print("Loading model...")
+    processor = Wav2Vec2Processor.from_pretrained(args.model_name, local_files_only=args.local_files_only)
     model = HubertModel.from_pretrained(args.model_name, local_files_only=args.local_files_only)
     model.to(device)
     model.eval()
@@ -59,24 +51,75 @@ def main():
     print(f"Loading dataset {args.dataset_path}...")
     dataset = load_from_disk(args.dataset_path)
     dataset = dataset['train']
+    dataset = dataset.select(range(100))
     print(f"Dataset size: {len(dataset)} samples")
     
+    # Define a custom collate function for padding
+    # def collate_fn_pad(batch):
+    #     has = time.time()
+    #     max_length = 8 * 16000  # Define the fixed length for padding
+    #     audio_tensors = [torch.tensor(sample["input_values"]).to(device) for sample in batch]
+    #     padded_audio = torch.stack([
+    #         torch.nn.functional.pad(audio, (0, max(0, max_length - audio.size(0))), mode='constant', value=0)[:max_length]
+    #         for audio in audio_tensors
+    #     ])
+    #     buk = time.time()
+    #     print(f"Time taken for collate function: {buk - has:.2f} seconds")
+    #     return padded_audio
+
+    def collate_fn_pad(batch):
+        max_length = 12 * 16000  # Define the fixed length for padding (128,000 samples)
+
+        # Convert input values to tensors and stack them into a single tensor
+        audio_tensors = torch.stack([torch.tensor(s["input_values"]) for s in batch]).to(device)
+
+        if arg.process:
+            audio_tensors = processor(audio_tensors, sampling_rate=16000, return_tensors="pt")
+
+        return audio_tensors
+        batch_size = len(audio_tensors)
+
+        # Create a padded tensor with the desired max_length
+        padded_audio = torch.zeros((batch_size, max_length), device=device)
+        for i, audio in enumerate(audio_tensors):
+            length = min(audio.size(0), max_length)
+            padded_audio[i, :length] = audio[:length]
+
+        return padded_audio
+
+    # Create a DataLoader with the custom collate function
+    print(f"Creating DataLoader with batch size {args.batch_size}...")
+    dataloader = DataLoader(dataset, batch_size=args.batch_size, collate_fn=collate_fn_pad)
     # Feature extraction
-    features_list = []
-    for idx, sample in enumerate(tqdm(dataset, desc="Processing samples")):
-        try:
-            features = extract_features_batch(sample, model, device)
-            features_list.append(features)
-        except Exception as e:
-            print(f"Error processing sample {idx}: {e}")
-    
-    if features_list:
-        all_features = np.vstack(features_list)
-        print(f"Total extracted features shape: {all_features.shape}")
-        np.save(args.output_file, all_features)
-        print(f"Features saved to: {args.output_file}")
-    else:
-        print("No features were extracted. Check the dataset and model.")
+
+    print(f"Extracting features from {len(dataloader)} batches...")
+    if os.path.isfile(args.feat_file):
+        print(f"Feature file already exists: {args.feat_file}")
+        os.remove(args.feat_file)
+        print(f"Removed: {args.feat_file}")
+    with NpyAppendArray(args.feat_file) as feat_f:
+        with open(args.len_file, "w") as leng_f:
+            for batch in tqdm(dataloader):
+                # input_values = batch.squeeze(0).to(torch.float32)  # Extract audio data from the batch and ensure it's in the correct format
+                with torch.no_grad():
+                    outputs = model(batch, output_hidden_states=True)
+                # Extract features from the 9th hidden state
+                features = outputs.hidden_states[9].cpu().numpy()
+                print(f"Feature shape: {features.shape}")
+                for f in features:
+                    feat_f.append(f)
+                    leng_f.write(f"{len(f)}\n")
+    print(f"Features saved to: {args.feat_file}")
+    print(f"Lengths saved to: {args.len_file}")
+
+    # # Save features to disk
+    # if features_list:
+    #     all_features = np.vstack(features_list)
+    #     print(f"Total extracted features shape: {all_features.shape}")
+    #     np.save(args.output_file, all_features)
+    #     print(f"Features saved to: {args.output_file}")
+    # else:
+    #     print("No features were extracted. Check the dataset and model.")
 
 if __name__ == "__main__":
     main()

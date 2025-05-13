@@ -7,13 +7,12 @@
 #SBATCH --time=12:00:00 # 12 hours
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=asudupe008@ikasle.ehu.eus
-#SBATCH --output=.slurm/train-kmeans-out.log
-#SBATCH --error=.slurm/train-kmeans-err.log
+#SBATCH --output=.slurm/apply-kmeans-out.log
+#SBATCH --error=.slurm/apply-kmeans-err.log
 #SBATCH --chdir=/home/andoni.sudupe/mHubert_finetune
 
 # Activate virtual environment
 conda activate hubert
 
-
 # Run the feature extraction script with command line arguments for HuggingFace dataset
-srun python -u scripts/kmeans/train_kmeans.py
+srun python -u scripts/kmeans/apply_kmeans.py

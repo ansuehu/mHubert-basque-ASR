@@ -1,6 +1,6 @@
 # Technical Report: Fine-Tuning the HuBERT Model
 ## Introduction
-HuBERT (Hidden-Unit BERT) is a self-supervised speech representation learning model designed to process and understand speech data effectively. By leveraging a masked prediction objective, HuBERT learns meaningful representations directly from raw audio, enabling it to excel in various speech-related tasks. This report focuses on the fine-tuning of the multilingual variant, mHuBERT-147, to enhance its performance on Basque for the automatic speech recognition (ASR) task.
+HuBERT (Hidden-Unit BERT) is a self-supervised speech representation learning model designed to process and understand speech data effectively. By leveraging a masked prediction objective, HuBERT learns meaningful representations directly from raw audio, enabling it to excel in various speech-related tasks. This report focuses on the fine-tuning of the multilingual variant, mHuBERT-147, to enhance its performance on Basque by training for the automatic speech recognition (ASR) task.
 
 ## State of the Art
 
@@ -19,7 +19,7 @@ The fine-tuning workflow was executed using the Hugging Face Transformers librar
 Text data was cleaned by removing special characters and used to construct a vocabulary. Audio data was resampled to 16 kHz and processed accordingly. Both the audio and text data were formatted and stored for efficient loading during training.
 
 #### Hyperparameter Tuning:
-Although extensive tuning was not performed, we adopted hyperparameters commonly used in previous mHuBERT fine-tuning experiments.
+Although extensive tuning was not performed, we adopted hyperparameters commonly used in other mHuBERT fine-tuning experiments.
 
 #### Training Strategy:
 Multiple training setups were explored, varying both the model type and the training mode. We compared the original HuBERT with the multilingual mHuBERT. Since these models are not task-specific, a Connectionist Temporal Classification (CTC) head was added for ASR. We experimented with two approaches: (a) fine-tuning only the CTC head, and (b) fine-tuning both the CTC head and the base model.

@@ -21,13 +21,13 @@ def assign_tokens(audio_path, model, processor, kmeans):
     return tokens
 
 def main():
-    model_name = ""
+    model_name = "Ansu/mHubert-basque-ASR"
     processor = Wav2Vec2Processor.from_pretrained(model_name)
     model = HubertModel.from_pretrained(model_name)
     model.eval()
-    kmeans = joblib.load("hubert_kmeans.pkl")
+    kmeans = joblib.load("checkpoints/kmeans/hubert_kmeans.pkl")
     
-    audio_path = "new_audio.wav"
+    audio_path = "data/composite_eu/audios/sample_1.wav"
     tokens = assign_tokens(audio_path, model, processor, kmeans)
     print("Assigned tokens:", tokens)
 
