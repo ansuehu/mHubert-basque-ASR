@@ -11,12 +11,13 @@
 #SBATCH --error=.slurm/evaluate-error-%N_%j.log
 #SBATCH --chdir=/home/andoni.sudupe/mHubert_finetune
 
-# Activate virtual environment
-conda activate hubert
 
 
 # Run the evaluation script with command line arguments
 srun python -u ./evaluate_hubert.py \
     --model_path "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700" \
-    --data_dir "/home/andoni.sudupe/mHubert_finetune/data/preprocessed_data" \
-    --datasets test_cv test_parl test_oslr \
+    --data_dir "/data/aholab/asr/corpus/Faktoria_Gaitu/asr/manifests/2025-01/2025-01_clean_norm.json" \
+    --vocab_path "basque_vocab.json" \
+    --manifest True \
+    --datasets train \
+    --num_samples 5

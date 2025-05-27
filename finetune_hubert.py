@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Union
 from scripts.utils import setup_processor, compute_metrics, load_data
 from evaluate import load
 import argparse
+from accelerate import Accelerator
 
 @dataclass
 class DataCollatorCTCWithPadding:
@@ -64,7 +65,18 @@ class DataCollatorCTCWithPadding:
 
         return batch
 
-def train_model(model_name, data_train, data_dev, processor, ctc_only = False, output_dir="checkpoints/mHubert_basque", push_to_hub=False):
+def train_model(model_name,
+                data_train,
+                data_dev,
+                processor,
+                ctc_only = False,
+                output_dir="checkpoints/mHubert_basque",
+                push_to_hub=False,
+                learning_rate=1e-5,
+                batch_size=8,
+                num_train_epochs=30,
+                dataloader_num_workers=4,):
+    
     """Train the HuBERT model."""
     # Initialize model
     model = HubertForCTC.from_pretrained(
@@ -79,6 +91,7 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
         pad_token_id=processor.tokenizer.pad_token_id,
         vocab_size=len(processor.tokenizer),
     )
+    model = model.to("cuda" if torch.cuda.is_available() else "cpu")
     
     # Freeze base model for transfer learning
     if ctc_only:
@@ -93,15 +106,15 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to="tensorboard",
-        per_device_train_batch_size=64,
-        per_device_eval_batch_size=4,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=int(batch_size/2),
         eval_strategy="steps",
-        num_train_epochs=30,
+        num_train_epochs=num_train_epochs,
         fp16=False,
         save_steps=1000,
         eval_steps=1000,
         logging_steps=100,
-        learning_rate=1e-5,
+        learning_rate=learning_rate,
         adam_beta1=0.9,
         adam_beta2=0.98,
         adam_epsilon=1e-08,
@@ -110,6 +123,7 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
         push_to_hub=False,
         group_by_length=False, #Bestela asko tardatzen du hasten entrenamendua. Erabili nahi bada datuek 'length' izeneko zutabe bat izan behar dute.
         load_best_model_at_end=True,
+        dataloader_num_workers=dataloader_num_workers,
     )
     
     # Set up metrics function
@@ -128,6 +142,9 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
         eval_dataset=data_dev,
         processing_class=processor.feature_extractor,
     )
+
+    accelerator = Accelerator()
+    trainer = accelerator.prepare(trainer)
     
     # Train the model
     print("\nStarting training...")
@@ -141,7 +158,19 @@ def train_model(model_name, data_train, data_dev, processor, ctc_only = False, o
     
     return model
 
-def continue_train_model(model_name, data_train, data_dev, processor, ctc_only = False, output_dir="checkpoints/mHubert_basque", push_to_hub=False):
+def continue_train_model(model_name,
+                         data_train,
+                         data_dev,
+                         processor,
+                         ctc_only, 
+                         output_dir, 
+                         push_to_hub,
+                         learning_rate,
+                         batch_size,
+                         num_train_epochs,
+                         gradient_accumulation_steps,
+                         dataloader_num_workers
+                         ):
     """Train the HuBERT model."""
     # Initialize model
     model = HubertForCTC.from_pretrained(
@@ -155,6 +184,7 @@ def continue_train_model(model_name, data_train, data_dev, processor, ctc_only =
         ctc_loss_reduction="mean",
         pad_token_id=processor.tokenizer.pad_token_id,
         vocab_size=len(processor.tokenizer),
+        
     )
     
     # Freeze base model for transfer learning
@@ -170,15 +200,16 @@ def continue_train_model(model_name, data_train, data_dev, processor, ctc_only =
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to="tensorboard",
-        per_device_train_batch_size=64,
-        per_device_eval_batch_size=4,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size/2,
         eval_strategy="steps",
-        num_train_epochs=50,
+        num_train_epochs=num_train_epochs,
         fp16=False,
         save_steps=1000,
         eval_steps=1000,
         logging_steps=100,
-        learning_rate=1e-5,
+        learning_rate=learning_rate,
+        gradient_accumulation_steps=gradient_accumulation_steps,
         adam_beta1=0.9,
         adam_beta2=0.98,
         adam_epsilon=1e-08,
@@ -187,6 +218,7 @@ def continue_train_model(model_name, data_train, data_dev, processor, ctc_only =
         push_to_hub=False,
         group_by_length=False, #Bestela asko tardatzen du hasten entrenamendua. Erabili nahi bada datuek 'length' izeneko zutabe bat izan behar dute.
         load_best_model_at_end=True,
+        dataloader_num_workers=dataloader_num_workers
     )
     
     # Set up metrics function
@@ -205,6 +237,8 @@ def continue_train_model(model_name, data_train, data_dev, processor, ctc_only =
         eval_dataset=data_dev,
         processing_class=processor.feature_extractor,
     )
+    accelerator = Accelerator()
+    trainer = accelerator.prepare(trainer)
     
     # Train the model
     print("\nStarting training...")
@@ -249,14 +283,16 @@ def main():
                         help="Repository name to push model to HuggingFace Hub (None to disable)")
     
     # Training parameters
-    parser.add_argument("--learning_rate", type=float, default=3e-4,
+    parser.add_argument("--learning_rate", type=float, default=1e-5,
                         help="Learning rate for training")
-    parser.add_argument("--batch_size", type=int, default=8,
+    parser.add_argument("--batch_size", type=int, default=64,
                         help="Batch size for training")
     parser.add_argument("--epochs", type=int, default=30,
                         help="Number of training epochs")
     parser.add_argument("--gradient_accumulation_steps", type=int, default=2,
                         help="Number of updates steps to accumulate before performing a backward/update pass")
+    parser.add_argument("--dataloader_num_workers", type=int, default=1,
+                        help="DataLoader num workers")
 
     # Parse arguments
     args = parser.parse_args()
@@ -269,7 +305,7 @@ def main():
     data = load_data(args.data_dir, split=args.split, sample_size=args.sample_size)
     
     # Set up processor
-    processor, _ = setup_processor(args.model_name)
+    processor, _ = setup_processor(args.model_name, args.data_dir + "/../vocab.json")
     
     # 2. Train model
     print("\nStep 2: Training model...")
@@ -286,7 +322,8 @@ def main():
             learning_rate=args.learning_rate,
             batch_size=args.batch_size,
             num_train_epochs=args.epochs,
-            gradient_accumulation_steps=args.gradient_accumulation_steps
+            gradient_accumulation_steps=args.gradient_accumulation_steps,
+            dataloader_num_workers=args.dataloader_num_workers
         )
     else:
         print(f"Starting training from pre-trained model: {args.model_name}")
@@ -301,7 +338,7 @@ def main():
             learning_rate=args.learning_rate,
             batch_size=args.batch_size,
             num_train_epochs=args.epochs,
-            gradient_accumulation_steps=args.gradient_accumulation_steps
+            dataloader_num_workers=args.dataloader_num_workers
         )
     
     # 3. Save final model

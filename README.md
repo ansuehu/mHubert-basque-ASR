@@ -134,3 +134,12 @@ predicted_ids = torch.argmax(logits, dim=-1)
 transcription = processor.batch_decode(predicted_ids)
 print(transcription[0])
 ```
+
+## Train your model
+
+```bash
+sbatch train.slurm
+```
+
+To continue a training, change some things form train.slurm (Entrenamendurako kode zatiye komentau ta continue_training kode zatiye deskomentau).
+After finishing a continued training, some thing may need to change in order to work. Inside of the last checkpoint it will be a file named trainer_state.json and another file named config.json. In the first one, the line that says "best_model_checkpoint" need to be changed to the name of the checkpoint, and the same in the second file, but the line that says "_name_or_path"
