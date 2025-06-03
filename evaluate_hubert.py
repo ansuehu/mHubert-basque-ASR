@@ -160,8 +160,8 @@ def main():
 
             results = evaluate_model_manifest(data[split_name], model, processor)
             # Save results to file
-            with open(f"/home/andoni.sudupe/mHubert_finetune/results/{dataset_name}_{model_name}_results.json", "w") as f:
-                json.dump(results, f, indent=4)
+            # with open(f"/home/andoni.sudupe/mHubert_finetune/results/{dataset_name}_{model_name}_results.json", "w") as f:
+            #     json.dump(results, f, indent=4)
             # Print metrics
             print(f"\n{split_name.upper()} WER: {results['test_wer']:.3f}")
             print(f"{split_name.upper()} CER: {results['test_cer']:.3f}")
@@ -176,7 +176,7 @@ def main():
     else:
         # Initialize tokenizer
         tokenizer = Wav2Vec2CTCTokenizer(
-            args.vocab_path, 
+            args.model_path+'/'+args.vocab_path, 
             unk_token="[UNK]", 
             pad_token="[PAD]", 
             word_delimiter_token="|"

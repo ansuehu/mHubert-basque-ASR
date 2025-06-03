@@ -14,10 +14,17 @@
 
 
 # Run the evaluation script with command line arguments
+# srun python -u ./evaluate_hubert.py \
+#     --model_path "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-continue/checkpoint-121080" \
+#     --data_dir "/data/aholab/asr/corpus/Faktoria_Gaitu/asr/manifests/2025-01/2025-01_clean_norm.json" \
+#     --vocab_path "basque_vocab.json" \
+#     --manifest True \
+#     --datasets train \
+#     --num_samples 5
+
 srun python -u ./evaluate_hubert.py \
-    --model_path "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-basque-ASR-30ep/checkpoint-302700" \
-    --data_dir "/data/aholab/asr/corpus/Faktoria_Gaitu/asr/manifests/2025-01/2025-01_clean_norm.json" \
-    --vocab_path "basque_vocab.json" \
-    --manifest True \
-    --datasets train \
+    --model_path "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-eues-ASR/checkpoint-151000" \
+    --data_dir "/home/andoni.sudupe/mHubert_finetune/data/composite_eues/preprocessed_data" \
+    --vocab_path "vocab.json" \
+    --datasets test_cv_es test_cv_eu test_mls_es test_oslr_es test_oslr_eu test_parl_es test_parl_eu test_vp_es \
     --num_samples 5

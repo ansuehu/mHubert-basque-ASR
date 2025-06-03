@@ -68,24 +68,23 @@ def main():
     #     return padded_audio
 
     def collate_fn_pad(batch):
-        max_length = 12 * 16000  # Define the fixed length for padding (128,000 samples)
+        # max_length = 12 * 16000  # Define the fixed length for padding (128,000 samples)
 
         # Convert input values to tensors and stack them into a single tensor
         audio_tensors = torch.stack([torch.tensor(s["input_values"]) for s in batch]).to(device)
 
-        if arg.process:
-            audio_tensors = processor(audio_tensors, sampling_rate=16000, return_tensors="pt")
+        audio_tensors = processor(audio_tensors, sampling_rate=16000, return_tensors="pt")
 
         return audio_tensors
-        batch_size = len(audio_tensors)
+        # batch_size = len(audio_tensors)
 
-        # Create a padded tensor with the desired max_length
-        padded_audio = torch.zeros((batch_size, max_length), device=device)
-        for i, audio in enumerate(audio_tensors):
-            length = min(audio.size(0), max_length)
-            padded_audio[i, :length] = audio[:length]
+        # # Create a padded tensor with the desired max_length
+        # padded_audio = torch.zeros((batch_size, max_length), device=device)
+        # for i, audio in enumerate(audio_tensors):
+        #     length = min(audio.size(0), max_length)
+        #     padded_audio[i, :length] = audio[:length]
 
-        return padded_audio
+        # return padded_audio
 
     # Create a DataLoader with the custom collate function
     print(f"Creating DataLoader with batch size {args.batch_size}...")
@@ -100,9 +99,11 @@ def main():
     with NpyAppendArray(args.feat_file) as feat_f:
         with open(args.len_file, "w") as leng_f:
             for batch in tqdm(dataloader):
+                # print(batch.shape)
+                print(batch['input_values'].shape)
                 # input_values = batch.squeeze(0).to(torch.float32)  # Extract audio data from the batch and ensure it's in the correct format
                 with torch.no_grad():
-                    outputs = model(batch, output_hidden_states=True)
+                    outputs = model(batch['input_values'].squeeze(0).to(device), output_hidden_states=True)
                 # Extract features from the 9th hidden state
                 features = outputs.hidden_states[9].cpu().numpy()
                 print(f"Feature shape: {features.shape}")

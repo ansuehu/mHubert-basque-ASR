@@ -11,14 +11,9 @@
 #SBATCH --error=.slurm/extract-features-error.log
 #SBATCH --chdir=/home/andoni.sudupe/mHubert_finetune
 
-# Activate virtual environment
-conda activate hubert
-
-cd /home/andoni.sudupe/mHubert_finetune
-
 # Run the feature extraction script with command line arguments for HuggingFace dataset
-python scripts/kmeans/extract_features.py \
-    --model_name "Ansu/mHubert-basque-ASR" \
+python -u scripts/kmeans/extract_features.py \
+    --model_name "Ansu/mHubert-basque-k1000-L9" \
     --dataset_path "data/composite_eu/preprocessed_data" \
     --batch_size 1 \
     --feat_file "data/composite_eu/hubert_basque_features.npy" \

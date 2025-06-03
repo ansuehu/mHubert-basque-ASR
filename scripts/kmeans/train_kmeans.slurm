@@ -11,9 +11,5 @@
 #SBATCH --error=.slurm/train-kmeans-err.log
 #SBATCH --chdir=/home/andoni.sudupe/mHubert_finetune
 
-# Activate virtual environment
-conda activate hubert
-
-
 # Run the feature extraction script with command line arguments for HuggingFace dataset
 srun python -u scripts/kmeans/train_kmeans.py

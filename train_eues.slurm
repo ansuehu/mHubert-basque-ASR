@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --partition=gpu-H100
 #SBATCH --job-name=mHubert-eues # Name of the process
-#SBATCH --gres=gpu:4 # Number of GPUs
+#SBATCH --gres=gpu:1 # Number of GPUs
 #SBATCH --cpus-per-gpu=2 # Number of CPU cores (2 is reasonable)
 #SBATCH --mem-per-gpu=16GB # RAM memory needed (8-16GB)
 #SBATCH --time=10-00:00 # No time limit
@@ -39,9 +39,18 @@
 #     --dataloader_num_workers 1
 
 srun python -u ./finetune_hubert.py \
-    --model_name "utter-project/mHuBERT-147" \
+    --model_name "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-eues-ASR/checkpoint-153000" \
     --data_dir "/home/andoni.sudupe/mHubert_finetune/data/composite_eues/preprocessed_data" \
     --output_dir "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-eues-ASR" \
-    --epochs 50 \
+    --epochs 35 \
     --batch_size 16 \
     --dataloader_num_workers 1
+
+# srun python -u ./finetune_hubert.py \
+#     --model_name "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-eues-ASR/checkpoint-153000" \
+#     --continue_training \
+#     --data_dir "/home/andoni.sudupe/mHubert_finetune/data/composite_eues/preprocessed_data" \
+#     --output_dir "/home/andoni.sudupe/mHubert_finetune/checkpoints/mHubert-eues-ASR" \
+#     --epochs 50 \
+#     --batch_size 16 \
+#     --dataloader_num_workers 1
